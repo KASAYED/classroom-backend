@@ -1,8 +1,8 @@
 import express from "express";
 import { eq, ilike, or, and, desc, sql, getTableColumns } from "drizzle-orm";
 
-import { db } from "../db";
-import { departments, subjects } from "../db/schema";
+import { db } from "../db/index.js";
+import { departments, subjects } from "../db/schema/app.js";
 
 const router = express.Router();
 
@@ -11,9 +11,11 @@ router.get("/", async (req, res) => {
     try {
         const { search, department, page = 1, limit = 10 } = req.query;
 
-        const currentPage = Math.max(1, +page);
-        const limitPerPage = Math.max(1, +limit);
+
+        const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
+        const limitPerPage = Math.max(1, Math.min(100, parseInt(String(limit), 10) || 10));
         const offset = (currentPage - 1) * limitPerPage;
+
 
         const filterConditions = [];
 
